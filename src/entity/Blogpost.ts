@@ -32,7 +32,7 @@ export class Blogpost extends BaseEntity {
 
   @Column("text", { array: true })
   tags: string[];
-
+  
   @ManyToOne(() => Author, (author) => author.blogposts)
   @JoinColumn({
     name: "author_id",

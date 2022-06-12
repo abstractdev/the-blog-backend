@@ -9,10 +9,10 @@ export async function userGet(req: Request, res: Response, next: NextFunction) {
     const users = await getRepository(User)
       .createQueryBuilder("user")
       .getMany();
-    return res.json(users);
+    res.json(users);
   } catch (error) {
     console.error(error);
-    throw new Error("Unable to connect to db");
+    res.sendStatus(400);
   }
 }
 // user POST

@@ -23,6 +23,9 @@ export class Comment extends BaseEntity {
   @CreateDateColumn()
   created_at: Date;
 
+  @Column("text", { array: true })
+  likes: string[];
+
   @ManyToOne(() => User, (user) => user.comments)
   @JoinColumn({
     name: "user_id",
