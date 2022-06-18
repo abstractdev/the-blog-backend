@@ -1,73 +1,249 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { getRepository } from "typeorm";
+import bcrypt from "bcrypt";
+import { body, validationResult } from "express-validator";
+import passport from "passport";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 import { User } from "../entity/User";
+import { verifyToken } from "../auth/bearerAuthorization";
+dotenv.config();
 
 // user GET
-export async function userGet(req: Request, res: Response, next: NextFunction) {
-  try {
-    //query database
-    const users = await getRepository(User)
-      .createQueryBuilder("user")
-      .getMany();
-    res.json(users);
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(400);
-  }
-}
-// user POST
-export async function userPost(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    //destructure users req data
+export const userGet = [
+  verifyToken,
+  (req: any, res: Response, next: NextFunction) => {
+    jwt.verify(
+      req.token,
+      process.env.JWT_SECRET!,
+      (err: any, authData: any) => {
+        if (err) {
+          console.log(err);
+          res.sendStatus(403);
+        } else {
+          try {
+            //query database
+            (async () => {
+              const user = await getRepository(User)
+                .createQueryBuilder("user")
+                .where("username = :username", { username: authData.username })
+                .getOne();
+              res.json(user);
+            })();
+          } catch (error) {
+            console.error(error);
+            res.sendStatus(400);
+          }
+        }
+      }
+    );
+  },
+];
+
+// user SIGNUP POST
+export const userSignUpPost = [
+  // Validate and sanitize fields.
+  body("username")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Username cannot be empty")
+    .isLength({ max: 20 })
+    .withMessage("Username cannot exceed 20 characters"),
+  body("password")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Password cannot be empty")
+    .isLength({ max: 200 })
+    .withMessage("Password cannot exceed 200 characters"),
+
+  // Process any after validation and sanitization.
+  (req: any, res: Response, next: NextFunction) => {
+    //destructure body
     const { username, password } = req.body;
-    //create user instance
-    const user = User.create({
-      username,
-      password,
-    });
-    await user.save();
-    res.sendStatus(201);
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(400);
-  }
-}
+
+    // Extract validation errors and send if not empty.
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.json(errors);
+      return;
+    } else {
+      bcrypt.hash(password, 10, (err, hashedPassword) => {
+        if (err) {
+          res.json(err);
+          return next(err);
+        } else {
+          (async () => {
+            //create user instance with hashed password
+            const user = User.create({
+              username,
+              password: hashedPassword,
+            });
+            //save user in database
+            try {
+              await user.save();
+              res.sendStatus(201);
+              return next;
+            } catch (err) {
+              if (err && err.code === "23505") {
+                res.json({ error: "Username already exists" });
+                return err;
+              }
+            }
+          })();
+        }
+      });
+    }
+  },
+];
+// user LOGIN POST
+export const userLogInPost = [
+  // Validate and sanitize fields.
+  body("username")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Username cannot be empty")
+    .isLength({ max: 20 })
+    .withMessage("Username cannot exceed 20 characters"),
+  body("password")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Password cannot be empty")
+    .isLength({ max: 200 })
+    .withMessage("Password cannot exceed 200 characters"),
+  // Process any after validation and sanitization.
+  (req: any, res: Response, next: NextFunction) => {
+    // Extract validation errors and send if not empty.
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.json(errors);
+      return;
+    } else {
+      passport.authenticate(
+        "local",
+        { session: false },
+        (err, username, info) => {
+          if (!username) {
+            return res.status(400).json({
+              message: "Incorrect Username",
+              username: username,
+            });
+          }
+          if (err) {
+            return res.status(400);
+          } else {
+            req.login(username, { session: false }, (err: any) => {
+              if (err) {
+                res.status(400).json({
+                  error: err,
+                });
+              } else {
+                (async () => {
+                  const user = await getRepository(User)
+                    .createQueryBuilder("user")
+                    .where("username = :username", {
+                      username: req.body.username,
+                    })
+                    .getOne();
+                  const token = jwt.sign(
+                    { username: user!.username, role: user!.role },
+                    process.env.JWT_SECRET!
+                  );
+                  return res.json(token);
+                })();
+              }
+            });
+          }
+        }
+      )(req, res, next);
+    }
+  },
+];
 // user PUT
-export async function userPut(req: Request, res: Response, next: NextFunction) {
-  //destructure users req data
-  const { username, password } = req.body;
-  try {
-    const user = await getRepository(User)
-      .createQueryBuilder()
-      .update()
-      .set({ username: username, password: password })
-      .where("username = :username", { username: req.params.username })
-      .execute();
-    res.sendStatus(200);
-  } catch (error) {
-    console.error(error);
-    res.sendStatus(400);
-  }
-}
+export const userPut = [
+  // Validate and sanitize fields.
+  body("username")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Username cannot be empty")
+    .isLength({ max: 20 })
+    .withMessage("Username cannot exceed 20 characters"),
+  body("password")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Password cannot be empty")
+    .isLength({ max: 200 })
+    .withMessage("Password cannot exceed 200 characters"),
+  //verify token
+  verifyToken,
+  (req: any, res: Response, next: NextFunction) => {
+    // Extract validation errors and send if not empty.
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.json(errors);
+      return;
+    } else {
+      jwt.verify(
+        req.token,
+        process.env.JWT_SECRET!,
+        (err: any, authData: any) => {
+          if (err) {
+            res.sendStatus(403);
+          } else {
+            const { username, password } = req.body;
+            const hashed = bcrypt.hash(password, 10, (err, hashedPassword) => {
+              if (err) {
+                res.json(err);
+                return next(err);
+              } else
+                try {
+                  (async () => {
+                    const user = await getRepository(User)
+                      .createQueryBuilder()
+                      .update()
+                      .set({ username: username, password: hashedPassword })
+                      .where("username = :username", {
+                        username: authData.username,
+                      })
+                      .execute();
+                    res.sendStatus(200);
+                  })();
+                } catch (error) {
+                  console.error(error);
+                  res.sendStatus(400);
+                }
+            });
+          }
+        }
+      );
+    }
+  },
+];
 // user DELETE
-export async function userDelete(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    const user = await getRepository(User)
-      .createQueryBuilder()
-      .delete()
-      .where("username = :username", { username: req.params.username })
-      .execute();
-    res.sendStatus(200);
-  } catch (error) {
-    console.log(error);
-    res.sendStatus(400);
-  }
-}
+export const userDelete = [
+  verifyToken,
+  (req: any, res: Response, next: NextFunction) => {
+    jwt.verify(
+      req.token,
+      process.env.JWT_SECRET!,
+      (err: any, authData: any) => {
+        if (err) {
+          res.sendStatus(403);
+        } else {
+          try {
+            (async () => {
+              const user = await getRepository(User)
+                .createQueryBuilder()
+                .delete()
+                .where("username = :username", { username: authData.username })
+                .execute();
+              res.sendStatus(200);
+            })();
+          } catch (error) {
+            console.log(error);
+            res.sendStatus(400);
+          }
+        }
+      }
+    );
+  },
+];
