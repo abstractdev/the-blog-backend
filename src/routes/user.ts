@@ -2,14 +2,16 @@ import express from "express";
 import {
   userDelete,
   userGet,
-  userPost,
+  userSignUpPost,
   userPut,
+  userLogInPost,
 } from "../controllers/userController";
 const router = express.Router();
 
 router.get("/", userGet);
-router.post("/", userPost);
-router.put("/:username", userPut);
-router.delete("/:username", userDelete);
+router.post("/signup", userSignUpPost);
+router.post("/login", userLogInPost);
+router.put("/", userPut);
+router.delete("/", userDelete);
 
 export default router;
