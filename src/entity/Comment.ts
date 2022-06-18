@@ -7,6 +7,7 @@ import {
   JoinColumn,
   CreateDateColumn,
 } from "typeorm";
+import { Blogpost } from "./Blogpost";
 import { User } from "./User";
 
 @Entity()
@@ -31,4 +32,10 @@ export class Comment extends BaseEntity {
     name: "user_id",
   })
   user: User;
+
+  @ManyToOne(() => Blogpost, (blogpost) => blogpost.comments)
+  @JoinColumn({
+    name: "blogpost_id",
+  })
+  blogpost: Blogpost;
 }

@@ -7,8 +7,10 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 import { Author } from "./Author";
+import { Comment } from "./Comment";
 
 @Entity()
 export class Blogpost extends BaseEntity {
@@ -32,7 +34,10 @@ export class Blogpost extends BaseEntity {
 
   @Column("text", { array: true })
   tags: string[];
-  
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
+
   @ManyToOne(() => Author, (author) => author.blogposts)
   @JoinColumn({
     name: "author_id",
