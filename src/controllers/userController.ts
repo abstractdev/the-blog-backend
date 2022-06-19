@@ -5,7 +5,7 @@ import { body, validationResult } from "express-validator";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { User } from "../entity/User";
+import { User, UserRole } from "../entity/User";
 import { verifyToken } from "../auth/bearerAuthorization";
 dotenv.config();
 
@@ -77,6 +77,7 @@ export const userSignUpPost = [
             const user = User.create({
               username,
               password: hashedPassword,
+              role: UserRole.AUTHOR,
             });
             //save user in database
             try {

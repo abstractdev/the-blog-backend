@@ -1,5 +1,5 @@
 import { Entity, Column, OneToMany } from "typeorm";
-import { User } from "./User";
+import { User, UserRole } from "./User";
 import { Blogpost } from "./Blogpost";
 
 @Entity()

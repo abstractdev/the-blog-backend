@@ -6,7 +6,11 @@ import {
   OneToMany,
 } from "typeorm";
 import { Comment } from "./Comment";
-export type UserRole = "user" | "author" | "admin";
+export enum UserRole {
+  USER = "user",
+  AUTHOR = "author",
+  ADMIN = "admin",
+}
 
 @Entity()
 export class User extends BaseEntity {
@@ -22,6 +26,6 @@ export class User extends BaseEntity {
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 
-  @Column({ type: "enum", enum: ["user", "author", "admin"], default: "user" })
+  @Column({ type: "enum", enum: UserRole })
   role: UserRole;
 }
