@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { User, UserRole } from "../entity/User";
 import { verifyToken } from "../auth/bearerAuthorization";
+import { Author } from "../entity/Author";
 dotenv.config();
 
 // user GET
@@ -138,15 +139,28 @@ export const userLogInPost = [
                   error: err,
                 });
               } else {
+                let user;
                 (async () => {
-                  const user = await getRepository(User)
+                  user = await getRepository(User)
                     .createQueryBuilder("user")
                     .where("username = :username", {
                       username: req.body.username,
                     })
                     .getOne();
+                  if (!user) {
+                    user = await getRepository(Author)
+                      .createQueryBuilder("author")
+                      .where("username = :username", {
+                        username: req.body.username,
+                      })
+                      .getOne();
+                  }
                   const token = jwt.sign(
-                    { username: user!.username, role: user!.role },
+                    {
+                      username: user!.username,
+                      role: user!.role,
+                      id: user!.id,
+                    },
                     process.env.JWT_SECRET!
                   );
                   return res.json(token);
