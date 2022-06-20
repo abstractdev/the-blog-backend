@@ -17,7 +17,7 @@ export class Blogpost extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 100, unique: true })
   title: string;
 
   @Column({ length: 10000 })
@@ -29,13 +29,13 @@ export class Blogpost extends BaseEntity {
   @UpdateDateColumn({ nullable: true })
   updated_at: Date;
 
-  @Column()
+  @Column({ default: false })
   is_published: Boolean;
 
-  @Column("text", { array: true })
+  @Column("text", { array: true, nullable: true })
   tags: string[];
 
-  @OneToMany(() => Comment, (comment) => comment.user)
+  @OneToMany(() => Comment, (comment) => comment.blogpost, { nullable: true })
   comments: Comment[];
 
   @ManyToOne(() => Author, (author) => author.blogposts)
@@ -43,4 +43,7 @@ export class Blogpost extends BaseEntity {
     name: "author_id",
   })
   author: Author;
+
+  @Column()
+  author_id: string;
 }
