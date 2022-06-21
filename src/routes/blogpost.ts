@@ -1,10 +1,15 @@
 import express from "express";
-import { blogpostGet, blogpostPost } from "../controllers/blogpostController";
+import {
+  blogpostDelete,
+  blogpostGet,
+  blogpostPost,
+  blogpostPut,
+} from "../controllers/blogpostController";
 const router = express.Router();
 
 router.get("/", blogpostGet);
 router.post("/", blogpostPost);
-// router.put("/", blogpostPut);
-// router.delete("/", blogpostDelete);
+router.put("/:id", blogpostPut);
+router.delete("/:id", blogpostDelete);
 
 export default router;

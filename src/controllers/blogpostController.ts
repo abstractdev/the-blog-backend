@@ -144,3 +144,33 @@ export const blogpostPut = [
     }
   },
 ];
+
+// blogpost DELETE
+export const blogpostDelete = [
+  verifyToken,
+  (req: any, res: Response, next: NextFunction) => {
+    jwt.verify(
+      req.token,
+      process.env.JWT_SECRET!,
+      (err: any, authData: any) => {
+        if (err) {
+          res.sendStatus(403);
+        } else {
+          try {
+            (async () => {
+              const blogpost = await getRepository(Blogpost)
+                .createQueryBuilder()
+                .delete()
+                .where("id = :id", { id: req.params.id })
+                .execute();
+              res.sendStatus(200);
+            })();
+          } catch (error) {
+            console.log(error);
+            res.sendStatus(400);
+          }
+        }
+      }
+    );
+  },
+];
