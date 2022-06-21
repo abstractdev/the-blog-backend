@@ -85,3 +85,62 @@ export const blogpostPost = [
     }
   },
 ];
+
+// blogpost PUT
+export const blogpostPut = [
+  // Validate and sanitize fields.
+  body("title")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Title cannot be empty")
+    .isLength({ max: 20 })
+    .withMessage("Title cannot exceed 20 characters"),
+  body("content")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Content cannot be empty")
+    .isLength({ max: 200 })
+    .withMessage("Content cannot exceed 200 characters"),
+  //verify token
+  verifyToken,
+  (req: any, res: Response, next: NextFunction) => {
+    // Extract validation errors and send if not empty.
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.json(errors);
+      return;
+    } else {
+      jwt.verify(
+        req.token,
+        process.env.JWT_SECRET!,
+        (err: any, authData: any) => {
+          if (err) {
+            res.sendStatus(403);
+          } else {
+            const { title, content } = req.body;
+            if (err) {
+              res.json(err);
+              return next(err);
+            } else
+              try {
+                (async () => {
+                  const blogpost = await getRepository(Blogpost)
+                    .createQueryBuilder()
+                    .update()
+                    .set({ title, content })
+                    .where("id = :id", {
+                      id: req.params.id,
+                    })
+                    .execute();
+                  res.sendStatus(200);
+                })();
+              } catch (error) {
+                console.error(error);
+                res.sendStatus(400);
+              }
+          }
+        }
+      );
+    }
+  },
+];
