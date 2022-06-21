@@ -1,4 +1,3 @@
-import { Author } from "./src/entity/Author";
 import { Blogpost } from "./src/entity/Blogpost";
 import { User } from "./src/entity/User";
 import { Comment } from "./src/entity/Comment";
@@ -15,5 +14,5 @@ module.exports = {
   password: process.env.TYPEORM_PASSWORD,
   database: process.env.TYPEORM_DATABASE,
   synchronize: true,
-  entities: [Author, User, Blogpost, BlogpostLike, Comment, CommentLike],
+  entities: [User, Blogpost, BlogpostLike, Comment, CommentLike],
 };

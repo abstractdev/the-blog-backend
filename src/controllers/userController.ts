@@ -7,7 +7,6 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { User, UserRole } from "../entity/User";
 import { verifyToken } from "../auth/bearerAuthorization";
-import { Author } from "../entity/Author";
 dotenv.config();
 
 // user GET
@@ -25,7 +24,8 @@ export const userGet = [
           try {
             //query database
             (async () => {
-              const user = await getRepository(User)
+              let user;
+              user = await getRepository(User)
                 .createQueryBuilder("user")
                 .where("username = :username", { username: authData.username })
                 .getOne();
@@ -60,7 +60,7 @@ export const userSignUpPost = [
   // Process any after validation and sanitization.
   (req: any, res: Response, next: NextFunction) => {
     //destructure body
-    const { username, password } = req.body;
+    const { username, password, role } = req.body;
 
     // Extract validation errors and send if not empty.
     const errors = validationResult(req);
@@ -78,7 +78,7 @@ export const userSignUpPost = [
             const user = User.create({
               username,
               password: hashedPassword,
-              role: UserRole.AUTHOR,
+              role,
             });
             //save user in database
             try {
@@ -139,22 +139,13 @@ export const userLogInPost = [
                   error: err,
                 });
               } else {
-                let user;
                 (async () => {
-                  user = await getRepository(User)
+                  const user = await getRepository(User)
                     .createQueryBuilder("user")
                     .where("username = :username", {
                       username: req.body.username,
                     })
                     .getOne();
-                  if (!user) {
-                    user = await getRepository(Author)
-                      .createQueryBuilder("author")
-                      .where("username = :username", {
-                        username: req.body.username,
-                      })
-                      .getOne();
-                  }
                   const token = jwt.sign(
                     {
                       username: user!.username,

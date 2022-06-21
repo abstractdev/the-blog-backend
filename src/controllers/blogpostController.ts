@@ -64,7 +64,7 @@ export const blogpostPost = [
                 const blogpost = Blogpost.create({
                   title,
                   content,
-                  author_id: authData.id,
+                  user_id: authData.id,
                 });
                 //save blogpost in database
                 try {

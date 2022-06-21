@@ -2,23 +2,15 @@ import passport from "passport";
 import { getRepository } from "typeorm";
 import { User } from "../entity/User";
 import bcrypt from "bcrypt";
-import { Author } from "../entity/Author";
 const LocalStrategy = require("passport-local").Strategy;
 
 passport.use(
   new LocalStrategy(async (username: string, password: string, done: any) => {
-    let user: User | undefined;
     try {
-      user = await getRepository(User)
+      const user = await getRepository(User)
         .createQueryBuilder("user")
         .where("username = :username", { username: username })
         .getOne();
-      if (!user) {
-        user = await getRepository(Author)
-          .createQueryBuilder("author")
-          .where("username = :username", { username: username })
-          .getOne();
-      }
       if (!user) {
         return done(null, false, { message: "Incorrect username" });
       } else {

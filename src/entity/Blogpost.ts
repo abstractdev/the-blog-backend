@@ -9,7 +9,7 @@ import {
   JoinColumn,
   OneToMany,
 } from "typeorm";
-import { Author } from "./Author";
+import { User } from "./User";
 import { Comment } from "./Comment";
 
 @Entity()
@@ -38,12 +38,12 @@ export class Blogpost extends BaseEntity {
   @OneToMany(() => Comment, (comment) => comment.blogpost, { nullable: true })
   comments: Comment[];
 
-  @ManyToOne(() => Author, (author) => author.blogposts)
+  @ManyToOne(() => User, (user) => user.blogposts)
   @JoinColumn({
-    name: "author_id",
+    name: "user_id",
   })
-  author: Author;
+  user: User;
 
   @Column()
-  author_id: string;
+  user_id: string;
 }
