@@ -56,6 +56,14 @@ export const userSignUpPost = [
     .withMessage("Password cannot be empty")
     .isLength({ max: 200 })
     .withMessage("Password cannot exceed 200 characters"),
+  body("first_name")
+    .trim()
+    .isLength({ max: 20 })
+    .withMessage("First name cannot exceed 20 characters"),
+  body("last_name")
+    .trim()
+    .isLength({ max: 20 })
+    .withMessage("Last name cannot exceed 20 characters"),
 
   // Process any after validation and sanitization.
   (req: any, res: Response, next: NextFunction) => {
