@@ -5,7 +5,7 @@ import { body, validationResult } from "express-validator";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { User, UserRole } from "../entity/User";
+import { User } from "../entity/User";
 import { verifyToken } from "../auth/bearerAuthorization";
 dotenv.config();
 

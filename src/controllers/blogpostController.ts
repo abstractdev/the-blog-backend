@@ -1,7 +1,6 @@
 import { Response, NextFunction } from "express";
 import { getRepository } from "typeorm";
 import { body, validationResult } from "express-validator";
-import passport from "passport";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Blogpost } from "../entity/Blogpost";
