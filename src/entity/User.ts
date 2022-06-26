@@ -35,8 +35,8 @@ export class User extends BaseEntity {
   @Column({ default: false })
   is_admin: boolean;
 
-  // @OneToMany(() => Comment, (comment) => comment.user)
-  // comments: Comment[];
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
 
   @OneToMany(() => Blogpost, (blogpost) => blogpost.user)
   blogposts: Blogpost[];
