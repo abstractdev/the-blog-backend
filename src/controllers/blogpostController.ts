@@ -1,10 +1,11 @@
 import { Response, NextFunction } from "express";
-import { getRepository } from "typeorm";
+import { getRepository, In } from "typeorm";
 import { body, validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Blogpost } from "../entity/Blogpost";
 import { verifyToken } from "../auth/bearerAuthorization";
+import { Category } from "../entity/Category";
 dotenv.config();
 
 export const blogpostGet = (req: any, res: Response, next: NextFunction) => {
@@ -29,7 +30,7 @@ export const blogpostPost = [
     .isLength({ min: 1 })
     .withMessage("Title cannot be empty")
     .isLength({ max: 100 })
-    .withMessage("Title cannot exceed 20 characters"),
+    .withMessage("Title cannot exceed 100 characters"),
   body("content")
     .trim()
     .isLength({ min: 1 })
@@ -53,17 +54,22 @@ export const blogpostPost = [
           if (err || authData.role !== "author") {
             res.sendStatus(403);
           } else {
-            const { title, content } = req.body;
+            const { title, content, categoryIds } = req.body;
             if (err) {
               res.json(err);
               return next(err);
             } else {
               (async () => {
-                //create blogpost instance
+                // query for categories
+                const categories = await getRepository(Category).find({
+                  where: { id: In([...categoryIds]) },
+                });
+                // create blogpost instance
                 const blogpost = Blogpost.create({
                   title,
                   content,
                   user_id: authData.id,
+                  categories,
                 });
                 //save blogpost in database
                 try {
