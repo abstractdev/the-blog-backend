@@ -6,11 +6,15 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
-  JoinColumn,
   OneToMany,
+  ManyToMany,
+  JoinColumn,
+  JoinTable,
 } from "typeorm";
 import { User } from "./User";
 import { Comment } from "./Comment";
+import { BlogpostLike } from "./BlogpostLike";
+import { Category } from "./Category";
 
 @Entity()
 export class Blogpost extends BaseEntity {
@@ -32,9 +36,6 @@ export class Blogpost extends BaseEntity {
   @Column({ default: false })
   is_published: Boolean;
 
-  @Column("text", { array: true, nullable: true })
-  tags: string[];
-
   @OneToMany(() => Comment, (comment) => comment.blogpost, { nullable: true })
   comments: Comment[];
 
@@ -46,4 +47,11 @@ export class Blogpost extends BaseEntity {
 
   @Column()
   user_id: string;
+
+  @OneToMany(() => BlogpostLike, (blogpostLike) => blogpostLike.blogpost)
+  blogpostLikes: BlogpostLike[];
+
+  @ManyToMany(() => Category, (category) => category.blogposts)
+  @JoinTable()
+  categories: Category[];
 }
