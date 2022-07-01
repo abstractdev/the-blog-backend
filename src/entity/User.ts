@@ -6,7 +6,9 @@ import {
   OneToMany,
 } from "typeorm";
 import { Blogpost } from "./Blogpost";
+import { BlogpostLike } from "./BlogpostLike";
 import { Comment } from "./Comment";
+import { CommentLike } from "./CommentLike";
 export enum UserRole {
   USER = "user",
   AUTHOR = "author",
@@ -40,4 +42,10 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Blogpost, (blogpost) => blogpost.user)
   blogposts: Blogpost[];
+
+  @OneToMany(() => CommentLike, (commentLike) => commentLike.user)
+  commentLikes: CommentLike[];
+
+  @OneToMany(() => BlogpostLike, (blogpostLike) => blogpostLike.user)
+  blogpostLikes: BlogpostLike[];
 }
