@@ -20,7 +20,6 @@ export const commentGet = (req: any, res: Response, next: NextFunction) => {
       res.json(comment);
     })();
   } catch (error) {
-    console.error(error);
     res.sendStatus(400);
   }
 };
@@ -131,7 +130,6 @@ export const commentPut = [
                   res.sendStatus(200);
                 })();
               } catch (error) {
-                console.error(error);
                 res.sendStatus(400);
               }
             }
@@ -163,7 +161,6 @@ export const commentDelete = [
               res.sendStatus(200);
             })();
           } catch (error) {
-            console.log(error);
             res.sendStatus(400);
           }
         }

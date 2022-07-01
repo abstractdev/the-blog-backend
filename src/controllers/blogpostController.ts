@@ -18,7 +18,6 @@ export const blogpostGet = (req: any, res: Response, next: NextFunction) => {
       res.json(blogpost);
     })();
   } catch (error) {
-    console.error(error);
     res.sendStatus(400);
   }
 };
@@ -140,7 +139,6 @@ export const blogpostPut = [
                   res.sendStatus(200);
                 })();
               } catch (error) {
-                console.error(error);
                 res.sendStatus(400);
               }
           }
@@ -171,7 +169,6 @@ export const blogpostDelete = [
               res.sendStatus(200);
             })();
           } catch (error) {
-            console.log(error);
             res.sendStatus(400);
           }
         }

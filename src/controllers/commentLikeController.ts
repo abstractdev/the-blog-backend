@@ -69,7 +69,6 @@ export const commentLikeDelete = [
               res.sendStatus(200);
             })();
           } catch (error) {
-            console.log(error);
             res.sendStatus(400);
           }
         }

@@ -8,7 +8,6 @@ export function verifyToken(req: any, res: Response, next: NextFunction) {
     req.token = bearerToken;
     next();
   } else {
-    console.log(req.headers)
     res.sendStatus(403);
   }
 }

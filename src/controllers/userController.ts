@@ -18,7 +18,6 @@ export const userGet = [
       process.env.JWT_SECRET!,
       (err: any, authData: any) => {
         if (err) {
-          console.log(err);
           res.sendStatus(403);
         } else {
           try {
@@ -32,7 +31,6 @@ export const userGet = [
               res.json(user);
             })();
           } catch (error) {
-            console.error(error);
             res.sendStatus(400);
           }
         }
@@ -222,7 +220,6 @@ export const userPut = [
                     res.sendStatus(200);
                   })();
                 } catch (error) {
-                  console.error(error);
                   res.sendStatus(400);
                 }
             });
@@ -253,7 +250,6 @@ export const userDelete = [
               res.sendStatus(200);
             })();
           } catch (error) {
-            console.log(error);
             res.sendStatus(400);
           }
         }

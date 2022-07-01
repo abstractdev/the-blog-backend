@@ -16,7 +16,6 @@ export const categoryGet = (req: any, res: Response, next: NextFunction) => {
       res.json(category);
     })();
   } catch (error) {
-    console.error(error);
     res.sendStatus(400);
   }
 };
@@ -81,7 +80,6 @@ export const categoryDelete = [
               res.sendStatus(200);
             })();
           } catch (error) {
-            console.log(error);
             res.sendStatus(400);
           }
         }

@@ -25,7 +25,6 @@ passport.use(
         });
       }
     } catch (error) {
-      console.log(error);
       done(error);
     }
   })
