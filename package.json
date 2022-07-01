@@ -31,5 +31,6 @@
       "start": "node --loader ts-node/esm src/index.ts",
       "typeorm": "typeorm-ts-node-esm",
       "dev": "nodemon --watch './**/*.ts' --exec 'ts-node' src/index.ts"
-   }
+   },
+   "engines": { "node": "16.14.2" }
 }
