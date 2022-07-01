@@ -6,8 +6,10 @@ import {
   ManyToOne,
   JoinColumn,
   CreateDateColumn,
+  OneToMany,
 } from "typeorm";
 import { Blogpost } from "./Blogpost";
+import { CommentLike } from "./CommentLike";
 import { User } from "./User";
 
 @Entity()
@@ -23,9 +25,6 @@ export class Comment extends BaseEntity {
 
   @CreateDateColumn()
   created_at: Date;
-
-  @Column("text", { array: true, nullable: true })
-  likes: string[];
 
   @ManyToOne(() => User, (user) => user.comments)
   @JoinColumn({
@@ -44,4 +43,7 @@ export class Comment extends BaseEntity {
 
   @Column()
   blogpost_id: string;
+
+  @OneToMany(() => CommentLike, (commentLike) => commentLike.comment)
+  commentLikes: CommentLike[];
 }

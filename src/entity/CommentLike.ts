@@ -5,6 +5,7 @@ import {
   JoinColumn,
   OneToOne,
   Column,
+  ManyToOne,
 } from "typeorm";
 import { User } from "./User";
 import { Comment } from "./Comment";
@@ -17,11 +18,17 @@ export class CommentLike extends BaseEntity {
   @Column({ default: false })
   is_liked: boolean;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User, (user) => user.commentLikes)
   @JoinColumn()
   user: User;
 
-  @OneToOne(() => Comment)
+  @Column()
+  userId: string;
+
+  @ManyToOne(() => Comment, (comment) => comment.commentLikes)
   @JoinColumn()
   comment: Comment;
+
+  @Column()
+  commentId: string;
 }
