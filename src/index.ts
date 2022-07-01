@@ -5,6 +5,9 @@ import indexRouter from "./routes/index";
 import usersRouter from "./routes/user";
 import blogpostRouter from "./routes/blogpost";
 import commentRouter from "./routes/comment";
+import commentLikeRouter from "./routes/commentLike";
+import blogpostLikeRouter from "./routes/blogpostLike";
+import categoryRouter from "./routes/category";
 require("./auth/passport");
 const app = express();
 dotenv.config();
@@ -21,6 +24,9 @@ const connection = (async () => {
     app.use("/users", usersRouter);
     app.use("/blog", blogpostRouter);
     app.use("/comment", commentRouter);
+    app.use("/commentLike", commentLikeRouter);
+    app.use("/blogpostLike", blogpostLikeRouter);
+    app.use("/category", categoryRouter);
     //init express server
     app.listen(process.env.PORT);
     console.log(`Listening on port ${process.env.PORT}`);
