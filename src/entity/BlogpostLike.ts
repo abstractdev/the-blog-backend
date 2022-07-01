@@ -3,8 +3,8 @@ import {
   PrimaryGeneratedColumn,
   BaseEntity,
   JoinColumn,
-  OneToOne,
   Column,
+  ManyToOne,
 } from "typeorm";
 import { User } from "./User";
 import { Blogpost } from "./Blogpost";
@@ -17,11 +17,17 @@ export class BlogpostLike extends BaseEntity {
   @Column({ default: false })
   is_liked: boolean;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User, (user) => user.blogpostLikes)
   @JoinColumn()
   user: User;
 
-  @OneToOne(() => Blogpost)
+  @Column()
+  userId: string;
+
+  @ManyToOne(() => Blogpost, (blogpost) => blogpost.blogpostLikes)
   @JoinColumn()
   blogpost: Blogpost;
+
+  @Column()
+  blogpostId: string;
 }
