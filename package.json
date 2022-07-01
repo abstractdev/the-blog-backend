@@ -1,7 +1,7 @@
 {
    "name": "blog",
    "version": "0.0.1",
-   "description": "Awesome project developed with TypeORM.",
+   "description": "blog",
    "devDependencies": {
       "@types/bcrypt": "^5.0.0",
       "@types/express": "^4.17.13",
@@ -30,7 +30,8 @@
    "scripts": {
       "start": "node --loader ts-node/esm src/index.ts",
       "typeorm": "typeorm-ts-node-esm",
-      "dev": "nodemon --watch './**/*.ts' --exec 'ts-node' src/index.ts"
+      "dev": "nodemon --watch './**/*.ts' --exec 'ts-node' src/index.ts",
+      "build": "tsc"
    },
    "engines": { "node": "16.14.2" }
 }
