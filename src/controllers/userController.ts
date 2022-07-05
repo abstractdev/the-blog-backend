@@ -1,5 +1,5 @@
 import { Response, NextFunction } from "express";
-import { getRepository } from "typeorm";
+import { AppDataSource } from "../index";
 import bcrypt from "bcrypt";
 import { body, validationResult } from "express-validator";
 import passport from "passport";
@@ -24,7 +24,7 @@ export const userGet = [
             //query database
             (async () => {
               let user;
-              user = await getRepository(User)
+              user = await AppDataSource.getRepository(User)
                 .createQueryBuilder("user")
                 .where("username = :username", { username: authData.username })
                 .getOne();
@@ -146,7 +146,7 @@ export const userLogInPost = [
                 });
               } else {
                 (async () => {
-                  const user = await getRepository(User)
+                  const user = await AppDataSource.getRepository(User)
                     .createQueryBuilder("user")
                     .where("username = :username", {
                       username: req.body.username,
@@ -209,7 +209,7 @@ export const userPut = [
               } else
                 try {
                   (async () => {
-                    const user = await getRepository(User)
+                    const user = await AppDataSource.getRepository(User)
                       .createQueryBuilder()
                       .update()
                       .set({ username: username, password: hashedPassword })
@@ -242,7 +242,7 @@ export const userDelete = [
         } else {
           try {
             (async () => {
-              const user = await getRepository(User)
+              const user = await AppDataSource.getRepository(User)
                 .createQueryBuilder()
                 .delete()
                 .where("username = :username", { username: authData.username })

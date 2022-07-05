@@ -1,5 +1,5 @@
 import { Response, NextFunction } from "express";
-import { getRepository } from "typeorm";
+import { AppDataSource } from "../index";
 import { body, validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -11,7 +11,7 @@ export const commentGet = (req: any, res: Response, next: NextFunction) => {
   try {
     //query database
     (async () => {
-      const comment = await getRepository(Comment)
+      const comment = await AppDataSource.getRepository(Comment)
         .createQueryBuilder("comment")
         .where("blogpost_id = :blogpost_id", {
           blogpost_id: req.params.blogpost_id,
@@ -119,7 +119,7 @@ export const commentPut = [
             } else {
               try {
                 (async () => {
-                  const comment = await getRepository(Comment)
+                  const comment = await AppDataSource.getRepository(Comment)
                     .createQueryBuilder()
                     .update()
                     .set({ content })
@@ -153,7 +153,7 @@ export const commentDelete = [
         } else {
           try {
             (async () => {
-              const comment = await getRepository(Comment)
+              const comment = await AppDataSource.getRepository(Comment)
                 .createQueryBuilder()
                 .delete()
                 .where("id = :id", { id: req.params.id })

@@ -1,5 +1,5 @@
 import { Response, NextFunction } from "express";
-import { getRepository } from "typeorm";
+import { AppDataSource } from "../index";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Category } from "../entity/Category";
@@ -10,7 +10,7 @@ export const categoryGet = (req: any, res: Response, next: NextFunction) => {
   try {
     //query database
     (async () => {
-      const category = await getRepository(Category)
+      const category = await AppDataSource.getRepository(Category)
         .createQueryBuilder("category")
         .getMany();
       res.json(category);
@@ -72,7 +72,7 @@ export const categoryDelete = [
         } else {
           try {
             (async () => {
-              const category = await getRepository(Category)
+              const category = await AppDataSource.getRepository(Category)
                 .createQueryBuilder()
                 .delete()
                 .where("id = :id", { id: req.params.id })

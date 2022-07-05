@@ -1,13 +1,13 @@
 import passport from "passport";
-import { getRepository } from "typeorm";
 import { User } from "../entity/User";
 import bcrypt from "bcrypt";
+import { AppDataSource } from "../index";
 const LocalStrategy = require("passport-local").Strategy;
 
 passport.use(
   new LocalStrategy(async (username: string, password: string, done: any) => {
     try {
-      const user = await getRepository(User)
+      const user = await AppDataSource.getRepository(User)
         .createQueryBuilder("user")
         .where("username = :username", { username: username })
         .getOne();

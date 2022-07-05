@@ -1,5 +1,6 @@
 import { Response, NextFunction } from "express";
-import { getRepository, In } from "typeorm";
+import { AppDataSource } from '../index';
+import { In } from "typeorm";
 import { body, validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -12,7 +13,7 @@ export const blogpostGet = (req: any, res: Response, next: NextFunction) => {
   try {
     //query database
     (async () => {
-      const blogpost = await getRepository(Blogpost)
+      const blogpost = await AppDataSource.getRepository(Blogpost)
         .createQueryBuilder("blogpost")
         .getMany();
       res.json(blogpost);
@@ -60,7 +61,7 @@ export const blogpostPost = [
             } else {
               (async () => {
                 // query for categories
-                const categories = await getRepository(Category).find({
+                const categories = await AppDataSource.getRepository(Category).find({
                   where: { id: In([...categoryIds]) },
                 });
                 // create blogpost instance
@@ -128,7 +129,7 @@ export const blogpostPut = [
             } else
               try {
                 (async () => {
-                  const blogpost = await getRepository(Blogpost)
+                  const blogpost = await AppDataSource.getRepository(Blogpost)
                     .createQueryBuilder()
                     .update()
                     .set({ title, content })
@@ -161,7 +162,7 @@ export const blogpostDelete = [
         } else {
           try {
             (async () => {
-              const blogpost = await getRepository(Blogpost)
+              const blogpost = await AppDataSource.getRepository(Blogpost)
                 .createQueryBuilder()
                 .delete()
                 .where("id = :id", { id: req.params.id })

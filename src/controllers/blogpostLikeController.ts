@@ -1,5 +1,5 @@
 import { Response, NextFunction } from "express";
-import { getRepository } from "typeorm";
+import { AppDataSource } from '../index';
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { BlogpostLike } from "../entity/BlogpostLike";
@@ -61,7 +61,7 @@ export const blogpostLikeDelete = [
         } else {
           try {
             (async () => {
-              const blogpostLike = await getRepository(BlogpostLike)
+              const blogpostLike = await AppDataSource.getRepository(BlogpostLike)
                 .createQueryBuilder()
                 .delete()
                 .where("id = :id", { id: req.params.id })
