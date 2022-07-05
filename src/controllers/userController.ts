@@ -1,7 +1,7 @@
 import { Response, NextFunction } from "express";
 import { AppDataSource } from "../index";
 import bcrypt from "bcrypt";
-import { body, validationResult } from "express-validator";
+import { body, check, validationResult } from "express-validator";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -54,6 +54,9 @@ export const userSignUpPost = [
     .withMessage("Password cannot be empty")
     .isLength({ max: 200 })
     .withMessage("Password cannot exceed 200 characters"),
+  check("passwordConfirmation", "Passwords do not match")
+    .exists()
+    .custom((value, { req }) => value === req.body.password),
   body("first_name")
     .trim()
     .isLength({ max: 20 })
