@@ -1,5 +1,5 @@
 import { Response, NextFunction } from "express";
-import { AppDataSource } from '../index';
+import { AppDataSource } from "../index";
 import { In } from "typeorm";
 import { body, validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
@@ -31,6 +31,12 @@ export const blogpostPost = [
     .withMessage("Title cannot be empty")
     .isLength({ max: 100 })
     .withMessage("Title cannot exceed 100 characters"),
+  body("image_url")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Image Url cannot be empty")
+    .isLength({ max: 100 })
+    .withMessage("Image Url cannot exceed 100 characters"),
   body("content")
     .trim()
     .isLength({ min: 1 })
@@ -54,19 +60,22 @@ export const blogpostPost = [
           if (err || authData.role !== "author") {
             res.sendStatus(403);
           } else {
-            const { title, content, categoryIds } = req.body;
+            const { title, image_url, content, categoryIds } = req.body;
             if (err) {
               res.json(err);
               return next(err);
             } else {
               (async () => {
                 // query for categories
-                const categories = await AppDataSource.getRepository(Category).find({
+                const categories = await AppDataSource.getRepository(
+                  Category
+                ).find({
                   where: { id: In([...categoryIds]) },
                 });
                 // create blogpost instance
                 const blogpost = Blogpost.create({
                   title,
+                  image_url,
                   content,
                   user_id: authData.id,
                   categories,
@@ -100,6 +109,12 @@ export const blogpostPut = [
     .withMessage("Title cannot be empty")
     .isLength({ max: 20 })
     .withMessage("Title cannot exceed 20 characters"),
+  body("image_url")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Image Url cannot be empty")
+    .isLength({ max: 100 })
+    .withMessage("Image Url cannot exceed 100 characters"),
   body("content")
     .trim()
     .isLength({ min: 1 })
@@ -122,7 +137,7 @@ export const blogpostPut = [
           if (err) {
             res.sendStatus(403);
           } else {
-            const { title, content } = req.body;
+            const { title, image_url, content } = req.body;
             if (err) {
               res.json(err);
               return next(err);
@@ -132,7 +147,7 @@ export const blogpostPut = [
                   const blogpost = await AppDataSource.getRepository(Blogpost)
                     .createQueryBuilder()
                     .update()
-                    .set({ title, content })
+                    .set({ title, image_url, content })
                     .where("id = :id", {
                       id: req.params.id,
                     })

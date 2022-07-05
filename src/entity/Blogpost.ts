@@ -24,7 +24,10 @@ export class Blogpost extends BaseEntity {
   @Column({ length: 100, unique: true })
   title: string;
 
-  @Column({ length: 10000 })
+  @Column({ length: 100 })
+  image_url: string;
+
+  @Column("text")
   content: string;
 
   @CreateDateColumn()
