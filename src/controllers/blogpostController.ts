@@ -26,6 +26,28 @@ export const blogpostGet = (req: any, res: Response, next: NextFunction) => {
     res.sendStatus(400);
   }
 };
+export const singleBlogpostGet = (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    //query database
+    (async () => {
+      const blogpost = await AppDataSource.getRepository(Blogpost)
+        .createQueryBuilder("blogpost")
+        .leftJoinAndSelect("blogpost.categories", "categories")
+        .leftJoinAndSelect("blogpost.comments", "comments")
+        .leftJoin("blogpost.user", "user")
+        .addSelect(["user.first_name", "user.last_name", "user.username"])
+        .where("title = :title", { title: req.params.title })
+        .getOne();
+      res.json(blogpost);
+    })();
+  } catch (error) {
+    res.sendStatus(400);
+  }
+};
 
 export const blogpostPost = [
   // Validate and sanitize fields.
