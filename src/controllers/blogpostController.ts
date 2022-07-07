@@ -16,7 +16,9 @@ export const blogpostGet = (req: any, res: Response, next: NextFunction) => {
       const blogpost = await AppDataSource.getRepository(Blogpost)
         .createQueryBuilder("blogpost")
         .leftJoinAndSelect("blogpost.categories", "categories")
-        .leftJoinAndSelect("blogpost.user", "user_id")
+        .leftJoinAndSelect("blogpost.comments", "comments")
+        .leftJoin("blogpost.user", "user")
+        .addSelect(["user.first_name", "user.last_name", "user.username"])
         .getMany();
       res.json(blogpost);
     })();
