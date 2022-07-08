@@ -17,6 +17,7 @@ export const blogpostGet = (req: any, res: Response, next: NextFunction) => {
         .createQueryBuilder("blogpost")
         .leftJoinAndSelect("blogpost.categories", "categories")
         .leftJoinAndSelect("blogpost.comments", "comments")
+        .leftJoinAndSelect("blogpost.blogpost_likes", "blogpost_likes")
         .leftJoin("blogpost.user", "user")
         .addSelect(["user.first_name", "user.last_name", "user.username"])
         .getMany();
@@ -38,6 +39,7 @@ export const singleBlogpostGet = (
         .createQueryBuilder("blogpost")
         .leftJoinAndSelect("blogpost.categories", "categories")
         .leftJoinAndSelect("blogpost.comments", "comments")
+        .leftJoinAndSelect("blogpost.blogpost_likes", "blogpost_likes")
         .leftJoin("blogpost.user", "user")
         .addSelect(["user.first_name", "user.last_name", "user.username"])
         .where("title = :title", { title: req.params.title })

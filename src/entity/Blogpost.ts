@@ -52,7 +52,7 @@ export class Blogpost extends BaseEntity {
   user_id: string;
 
   @OneToMany(() => BlogpostLike, (blogpostLike) => blogpostLike.blogpost)
-  blogpostLikes: BlogpostLike[];
+  blogpost_likes: BlogpostLike[];
 
   @ManyToMany(() => Category, (category) => category.blogposts)
   @JoinTable()

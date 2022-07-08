@@ -45,5 +45,5 @@ export class Comment extends BaseEntity {
   blogpost_id: string;
 
   @OneToMany(() => CommentLike, (commentLike) => commentLike.comment)
-  commentLikes: CommentLike[];
+  comment_likes: CommentLike[];
 }

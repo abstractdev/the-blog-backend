@@ -16,6 +16,7 @@ export const commentGet = (req: any, res: Response, next: NextFunction) => {
         .where("blogpost_id = :blogpost_id", {
           blogpost_id: req.params.blogpost_id,
         })
+        .leftJoinAndSelect("comment.comment_likes", "comment_likes")
         .getOne();
       res.json(comment);
     })();

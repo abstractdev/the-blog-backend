@@ -44,8 +44,8 @@ export class User extends BaseEntity {
   blogposts: Blogpost[];
 
   @OneToMany(() => CommentLike, (commentLike) => commentLike.user)
-  commentLikes: CommentLike[];
+  comment_likes: CommentLike[];
 
   @OneToMany(() => BlogpostLike, (blogpostLike) => blogpostLike.user)
-  blogpostLikes: BlogpostLike[];
+  blogpost_likes: BlogpostLike[];
 }

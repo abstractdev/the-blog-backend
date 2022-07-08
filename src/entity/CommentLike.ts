@@ -18,14 +18,14 @@ export class CommentLike extends BaseEntity {
   @Column({ default: false })
   is_liked: boolean;
 
-  @ManyToOne(() => User, (user) => user.commentLikes)
+  @ManyToOne(() => User, (user) => user.comment_likes)
   @JoinColumn()
   user: User;
 
   @Column()
   userId: string;
 
-  @ManyToOne(() => Comment, (comment) => comment.commentLikes)
+  @ManyToOne(() => Comment, (comment) => comment.comment_likes)
   @JoinColumn()
   comment: Comment;
 
