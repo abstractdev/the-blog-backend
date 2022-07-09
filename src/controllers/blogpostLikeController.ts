@@ -1,5 +1,5 @@
 import { Response, NextFunction } from "express";
-import { AppDataSource } from '../index';
+import { AppDataSource } from "../index";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { BlogpostLike } from "../entity/BlogpostLike";
@@ -18,31 +18,71 @@ export const blogpostLikePost = [
         if (err) {
           res.sendStatus(403);
         } else {
-          const { is_liked } = req.body;
-          if (err) {
-            res.json(err);
-            return next(err);
-          } else {
-            (async () => {
-              //create blogpostLike instance
+          (async () => {
+            const blogpostLikeGet = await AppDataSource.getRepository(
+              BlogpostLike
+            )
+              .createQueryBuilder("blogpostLike")
+              .where("blogpostLike.blogpostId = :blogpostId", {
+                blogpostId: req.params.blogpostId,
+              })
+              .getOne();
+            if (blogpostLikeGet?.userId !== authData.id) {
+              console.log("not equal");
               const blogpostLike = BlogpostLike.create({
-                is_liked,
+                is_liked: true,
                 userId: authData.id,
-                blogpostId: req.params.id,
+                blogpostId: req.params.blogpostId,
               });
               //save blogpostLike in database
               try {
-                await blogpostLike.save();
-                res.sendStatus(201);
-                return next;
+                async () => {
+                  await blogpostLike.save();
+                  res.sendStatus(201);
+                  return next;
+                };
               } catch (err) {
                 if (err) {
                   res.json(err);
                   return err;
                 }
               }
-            })();
-          }
+            } else if (
+              blogpostLikeGet?.userId === authData.id &&
+              blogpostLikeGet?.is_liked
+            ) {
+              (async () => {
+                const blogpostLikePut = await AppDataSource.getRepository(
+                  BlogpostLike
+                )
+                  .createQueryBuilder()
+                  .update()
+                  .set({ is_liked: false })
+                  .where("blogpostId = :blogpostId", {
+                    blogpostId: req.params.blogpostId,
+                  })
+                  .execute();
+                res.json({ is_liked: "updated to false" });
+              })();
+            } else if (
+              blogpostLikeGet?.userId === authData.id &&
+              !blogpostLikeGet?.is_liked
+            ) {
+              (async () => {
+                const blogpostLikeGet = await AppDataSource.getRepository(
+                  BlogpostLike
+                )
+                  .createQueryBuilder()
+                  .update()
+                  .set({ is_liked: true })
+                  .where("blogpostId = :blogpostId", {
+                    blogpostId: req.params.blogpostId,
+                  })
+                  .execute();
+                res.json({ is_liked: "updated to true" });
+              })();
+            }
+          })();
         }
       }
     );
@@ -61,7 +101,9 @@ export const blogpostLikeDelete = [
         } else {
           try {
             (async () => {
-              const blogpostLike = await AppDataSource.getRepository(BlogpostLike)
+              const blogpostLike = await AppDataSource.getRepository(
+                BlogpostLike
+              )
                 .createQueryBuilder()
                 .delete()
                 .where("id = :id", { id: req.params.id })

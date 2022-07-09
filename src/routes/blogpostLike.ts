@@ -5,6 +5,6 @@ import {
 } from "../controllers/blogpostLikeController";
 const router = express.Router();
 
-router.post("/:id", blogpostLikePost);
-router.delete("/:id", blogpostLikeDelete);
+router.post("/:blogpostId", blogpostLikePost);
+router.delete("/:blogpostId", blogpostLikeDelete);
 export default router;
