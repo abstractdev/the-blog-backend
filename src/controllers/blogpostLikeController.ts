@@ -28,19 +28,19 @@ export const blogpostLikePost = [
               })
               .getOne();
             if (blogpostLikeGet?.userId !== authData.id) {
-              console.log("not equal");
               const blogpostLike = BlogpostLike.create({
                 is_liked: true,
                 userId: authData.id,
                 blogpostId: req.params.blogpostId,
+                blogpost_title: req.body.blogpost_title,
               });
               //save blogpostLike in database
               try {
-                async () => {
+                (async () => {
                   await blogpostLike.save();
-                  res.sendStatus(201);
+                  res.json({ is_liked: true });
                   return next;
-                };
+                })();
               } catch (err) {
                 if (err) {
                   res.json(err);
@@ -62,7 +62,7 @@ export const blogpostLikePost = [
                     blogpostId: req.params.blogpostId,
                   })
                   .execute();
-                res.json({ is_liked: "updated to false" });
+                res.json({ is_liked: false });
               })();
             } else if (
               blogpostLikeGet?.userId === authData.id &&
@@ -79,40 +79,10 @@ export const blogpostLikePost = [
                     blogpostId: req.params.blogpostId,
                   })
                   .execute();
-                res.json({ is_liked: "updated to true" });
+                res.json({ is_liked: true });
               })();
             }
           })();
-        }
-      }
-    );
-  },
-];
-
-export const blogpostLikeDelete = [
-  verifyToken,
-  (req: any, res: Response, next: NextFunction) => {
-    jwt.verify(
-      req.cookies.access_token,
-      process.env.JWT_SECRET!,
-      (err: any, authData: any) => {
-        if (err) {
-          res.sendStatus(403);
-        } else {
-          try {
-            (async () => {
-              const blogpostLike = await AppDataSource.getRepository(
-                BlogpostLike
-              )
-                .createQueryBuilder()
-                .delete()
-                .where("id = :id", { id: req.params.id })
-                .execute();
-              res.sendStatus(200);
-            })();
-          } catch (error) {
-            res.sendStatus(400);
-          }
         }
       }
     );

@@ -31,4 +31,7 @@ export class CommentLike extends BaseEntity {
 
   @Column()
   commentId: string;
+
+  @Column()
+  comment_content: string;
 }

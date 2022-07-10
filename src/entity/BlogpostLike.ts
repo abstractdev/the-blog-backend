@@ -30,4 +30,7 @@ export class BlogpostLike extends BaseEntity {
 
   @Column()
   blogpostId: string;
+
+  @Column()
+  blogpost_title: string;
 }
