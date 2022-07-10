@@ -5,7 +5,7 @@ import { body, validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Blogpost } from "../entity/Blogpost";
-import { verifyToken } from "../auth/bearerAuthorization";
+import { verifyToken } from "../auth/Authorization";
 import { Category } from "../entity/Category";
 dotenv.config();
 
@@ -82,7 +82,7 @@ export const blogpostPost = [
       return;
     } else {
       jwt.verify(
-        req.token,
+        req.cookies.access_token,
         process.env.JWT_SECRET!,
         (err: any, authData: any) => {
           if (err || authData.role !== "author") {
@@ -159,7 +159,7 @@ export const blogpostPut = [
       return;
     } else {
       jwt.verify(
-        req.token,
+        req.cookies.access_token,
         process.env.JWT_SECRET!,
         (err: any, authData: any) => {
           if (err) {
@@ -197,7 +197,7 @@ export const blogpostDelete = [
   verifyToken,
   (req: any, res: Response, next: NextFunction) => {
     jwt.verify(
-      req.token,
+      req.cookies.access_token,
       process.env.JWT_SECRET!,
       (err: any, authData: any) => {
         if (err) {

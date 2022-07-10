@@ -4,7 +4,7 @@ import { body, validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Comment } from "../entity/Comment";
-import { verifyToken } from "../auth/bearerAuthorization";
+import { verifyToken } from "../auth/Authorization";
 dotenv.config();
 
 export const commentGet = (req: any, res: Response, next: NextFunction) => {
@@ -48,7 +48,7 @@ export const commentPost = [
       return;
     } else {
       jwt.verify(
-        req.token,
+        req.cookies.access_token,
         process.env.JWT_SECRET!,
         (err: any, authData: any) => {
           if (err) {
@@ -107,7 +107,7 @@ export const commentPut = [
       return;
     } else {
       jwt.verify(
-        req.token,
+        req.cookies.access_token,
         process.env.JWT_SECRET!,
         (err: any, authData: any) => {
           if (err) {
@@ -146,7 +146,7 @@ export const commentDelete = [
   verifyToken,
   (req: any, res: Response, next: NextFunction) => {
     jwt.verify(
-      req.token,
+      req.cookies.access_token,
       process.env.JWT_SECRET!,
       (err: any, authData: any) => {
         if (err) {

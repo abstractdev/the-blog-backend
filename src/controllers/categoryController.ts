@@ -3,7 +3,7 @@ import { AppDataSource } from "../index";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Category } from "../entity/Category";
-import { verifyToken } from "../auth/bearerAuthorization";
+import { verifyToken } from "../auth/Authorization";
 dotenv.config();
 
 export const categoryGet = (req: any, res: Response, next: NextFunction) => {
@@ -25,7 +25,7 @@ export const categoryPost = [
   // Process any after validation and sanitization.
   (req: any, res: Response, next: NextFunction) => {
     jwt.verify(
-      req.token,
+      req.cookies.access_token,
       process.env.JWT_SECRET!,
       (err: any, authData: any) => {
         if (err || authData.role !== "author") {
@@ -64,7 +64,7 @@ export const categoryDelete = [
   verifyToken,
   (req: any, res: Response, next: NextFunction) => {
     jwt.verify(
-      req.token,
+      req.cookies.access_token,
       process.env.JWT_SECRET!,
       (err: any, authData: any) => {
         if (err || authData.role !== "author") {

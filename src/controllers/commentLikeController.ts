@@ -3,7 +3,7 @@ import { AppDataSource } from "../index";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { CommentLike } from "../entity/CommentLike";
-import { verifyToken } from "../auth/bearerAuthorization";
+import { verifyToken } from "../auth/Authorization";
 dotenv.config();
 
 export const commentLikePost = [
@@ -12,7 +12,7 @@ export const commentLikePost = [
   (req: any, res: Response, next: NextFunction) => {
     // Extract validation errors and send if not empty.
     jwt.verify(
-      req.token,
+      req.cookies.access_token,
       process.env.JWT_SECRET!,
       (err: any, authData: any) => {
         if (err) {
@@ -53,7 +53,7 @@ export const commentLikeDelete = [
   verifyToken,
   (req: any, res: Response, next: NextFunction) => {
     jwt.verify(
-      req.token,
+      req.cookies.access_token,
       process.env.JWT_SECRET!,
       (err: any, authData: any) => {
         if (err) {

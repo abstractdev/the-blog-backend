@@ -6,7 +6,7 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { User } from "../entity/User";
-import { verifyToken } from "../auth/bearerAuthorization";
+import { verifyToken } from "../auth/Authorization";
 dotenv.config();
 
 // user GET
@@ -14,7 +14,7 @@ export const userGet = [
   verifyToken,
   (req: any, res: Response, next: NextFunction) => {
     jwt.verify(
-      req.token,
+      req.cookies.access_token,
       process.env.JWT_SECRET!,
       (err: any, authData: any) => {
         if (err) {
@@ -23,12 +23,24 @@ export const userGet = [
           try {
             //query database
             (async () => {
-              let user;
-              user = await AppDataSource.getRepository(User)
+              const user = await AppDataSource.getRepository(User)
                 .createQueryBuilder("user")
                 .where("username = :username", { username: authData.username })
+                .leftJoinAndSelect("user.comments", "comments")
+                .leftJoinAndSelect("user.blogpost_likes", "blogpost_likes")
+                .leftJoinAndSelect("user.comment_likes", "comment_likes")
                 .getOne();
-              res.json(user);
+              const filteredUser = {
+                id: user?.id,
+                first_name: user?.first_name,
+                last_name: user?.last_name,
+                username: user?.username,
+                role: user?.role,
+                comments: user?.comments,
+                blogpost_likes: user?.blogpost_likes,
+                comment_likes: user?.comment_likes,
+              };
+              res.json(filteredUser);
             })();
           } catch (error) {
             res.sendStatus(400);
@@ -163,7 +175,14 @@ export const userLogInPost = [
                     },
                     process.env.JWT_SECRET!
                   );
-                  return res.json(token);
+                  return res
+                    .cookie("access_token", token, {
+                      httpOnly: true,
+                      sameSite: 'none',
+                      secure: true
+                    })
+                    .status(200)
+                    .json({ message: "Logged in successfully" });
                 })();
               }
             });
@@ -173,6 +192,28 @@ export const userLogInPost = [
     }
   },
 ];
+
+// user Logout POST
+export const userLogoutPost = [
+  verifyToken,
+  (req: any, res: Response, next: NextFunction) => {
+    jwt.verify(
+      req.cookies.access_token,
+      process.env.JWT_SECRET!,
+      (err: any, authData: any) => {
+        if (err) {
+          res.sendStatus(403);
+        } else {
+          return res
+            .clearCookie("access_token")
+            .status(200)
+            .json({ message: "Successfully logged out" });
+        }
+      }
+    );
+  },
+];
+
 // user PUT
 export const userPut = [
   // Validate and sanitize fields.
@@ -198,7 +239,7 @@ export const userPut = [
       return;
     } else {
       jwt.verify(
-        req.token,
+        req.cookies.access_token,
         process.env.JWT_SECRET!,
         (err: any, authData: any) => {
           if (err) {
@@ -237,7 +278,7 @@ export const userDelete = [
   verifyToken,
   (req: any, res: Response, next: NextFunction) => {
     jwt.verify(
-      req.token,
+      req.cookies.access_token,
       process.env.JWT_SECRET!,
       (err: any, authData: any) => {
         if (err) {
