@@ -178,8 +178,8 @@ export const userLogInPost = [
                   return res
                     .cookie("access_token", token, {
                       httpOnly: true,
-                      sameSite: 'none',
-                      secure: true
+                      sameSite: "none",
+                      secure: true,
                     })
                     .status(200)
                     .json({ message: "Logged in successfully" });
@@ -205,7 +205,12 @@ export const userLogoutPost = [
           res.sendStatus(403);
         } else {
           return res
-            .clearCookie("access_token")
+            .cookie("access_token", "", {
+              maxAge: 0,
+              httpOnly: true,
+              sameSite: "none",
+              secure: true,
+            })
             .status(200)
             .json({ message: "Successfully logged out" });
         }

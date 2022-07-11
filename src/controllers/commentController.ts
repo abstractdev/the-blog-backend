@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Comment } from "../entity/Comment";
 import { verifyToken } from "../auth/Authorization";
+import { User } from "src/entity/User";
 dotenv.config();
 
 export const commentGet = (req: any, res: Response, next: NextFunction) => {
@@ -41,11 +42,33 @@ export const commentPost = [
   verifyToken,
   // Process any after validation and sanitization.
   (req: any, res: Response, next: NextFunction) => {
+    const { content, created_by } = req.body;
     // Extract validation errors and send if not empty.
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       res.json(errors);
       return;
+    } else if (created_by) {
+      (async () => {
+        //create comment instance
+        const comment = Comment.create({
+          content,
+          created_by,
+          blogpost_id: req.body.blogpost_id,
+          user_id: "6dd227eb-6e98-448c-ab42-c5a990840b37",
+        });
+        //save comment in database
+        try {
+          await comment.save();
+          res.sendStatus(201);
+          return next;
+        } catch (err) {
+          if (err) {
+            res.json(err);
+            return err;
+          }
+        }
+      })();
     } else {
       jwt.verify(
         req.cookies.access_token,
@@ -54,7 +77,6 @@ export const commentPost = [
           if (err) {
             res.sendStatus(403);
           } else {
-            const { content, created_by } = req.body;
             if (err) {
               res.json(err);
               return next(err);
@@ -63,7 +85,7 @@ export const commentPost = [
                 //create comment instance
                 const comment = Comment.create({
                   content,
-                  created_by,
+                  created_by: authData.username,
                   blogpost_id: req.body.blogpost_id,
                   user_id: authData.id,
                 });
