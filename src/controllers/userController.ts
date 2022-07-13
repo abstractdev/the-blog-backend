@@ -81,7 +81,7 @@ export const userSignUpPost = [
   // Process any after validation and sanitization.
   (req: any, res: Response, next: NextFunction) => {
     //destructure body
-    const { username, password, role } = req.body;
+    const { first_name, last_name, username, password, role } = req.body;
 
     // Extract validation errors and send if not empty.
     const errors = validationResult(req);
@@ -95,15 +95,26 @@ export const userSignUpPost = [
           return next(err);
         } else {
           (async () => {
-            //create user instance with hashed password
-            const user = User.create({
-              username,
-              password: hashedPassword,
-              role,
-            });
+            let user;
+            if (role === "author") {
+              user = User.create({
+                first_name,
+                last_name,
+                username,
+                password: hashedPassword,
+                role,
+              });
+            } else if (role === "user") {
+              //create user instance with hashed password
+              user = User.create({
+                username,
+                password: hashedPassword,
+                role,
+              });
+            }
             //save user in database
             try {
-              await user.save();
+              await user?.save();
               res.sendStatus(201);
               return next;
             } catch (err) {
@@ -147,7 +158,7 @@ export const userLogInPost = [
         (err, username, info) => {
           if (!username) {
             return res.status(400).json({
-              message: "Incorrect Username",
+              message: "Incorrect Username or Password",
               username: username,
             });
           }

@@ -18,7 +18,25 @@ export const commentGet = (req: any, res: Response, next: NextFunction) => {
           blogpost_id: req.params.blogpost_id,
         })
         .leftJoinAndSelect("comment.comment_likes", "comment_likes")
+        .getMany();
+      res.json(comment);
+    })();
+  } catch (error) {
+    res.sendStatus(400);
+  }
+};
+
+export const singleCommentGet = (req: any, res: Response, next: NextFunction) => {
+  console.log('a')
+  try {
+    //query database
+    (async () => {
+      const comment = await AppDataSource.getRepository(Comment)
+        .createQueryBuilder("comment")
+        .where("comment.id = :id", { id: req.params.comment_id })
+        .leftJoinAndSelect("comment.comment_likes", "comment_likes")
         .getOne();
+        console.log(comment)
       res.json(comment);
     })();
   } catch (error) {

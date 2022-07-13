@@ -3,7 +3,6 @@ import {
   PrimaryGeneratedColumn,
   BaseEntity,
   JoinColumn,
-  OneToOne,
   Column,
   ManyToOne,
 } from "typeorm";
@@ -14,9 +13,6 @@ import { Comment } from "./Comment";
 export class CommentLike extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
-
-  @Column({ default: false })
-  is_liked: boolean;
 
   @ManyToOne(() => User, (user) => user.comment_likes)
   @JoinColumn()
@@ -34,4 +30,7 @@ export class CommentLike extends BaseEntity {
 
   @Column()
   comment_content: string;
+
+  @Column()
+  created_by: string;
 }
