@@ -19,70 +19,61 @@ export const blogpostLikePost = [
           res.sendStatus(403);
         } else {
           (async () => {
-            const blogpostLikeGet = await AppDataSource.getRepository(
-              BlogpostLike
-            )
-              .createQueryBuilder("blogpostLike")
-              .where("blogpostLike.blogpostId = :blogpostId", {
-                blogpostId: req.params.blogpostId,
-              })
-              .getOne();
-            if (blogpostLikeGet?.userId !== authData.id) {
-              const blogpostLike = BlogpostLike.create({
-                is_liked: true,
-                userId: authData.id,
-                blogpostId: req.params.blogpostId,
-                blogpost_title: req.body.blogpost_title,
-              });
-              //save blogpostLike in database
-              try {
-                (async () => {
-                  await blogpostLike.save();
-                  res.json({ is_liked: true });
-                  return next;
-                })();
-              } catch (err) {
-                if (err) {
-                  res.json(err);
-                  return err;
-                }
-              }
-            } else if (
-              blogpostLikeGet?.userId === authData.id &&
-              blogpostLikeGet?.is_liked
-            ) {
+            const blogpostLike = BlogpostLike.create({
+              userId: authData.id,
+              blogpostId: req.params.blogpostId,
+              blogpost_title: req.body.blogpost_title,
+            });
+            //save blogpostLike in database
+            try {
               (async () => {
-                const blogpostLikePut = await AppDataSource.getRepository(
-                  BlogpostLike
-                )
-                  .createQueryBuilder()
-                  .update()
-                  .set({ is_liked: false })
-                  .where("blogpostId = :blogpostId", {
-                    blogpostId: req.params.blogpostId,
-                  })
-                  .execute();
-                res.json({ is_liked: false });
-              })();
-            } else if (
-              blogpostLikeGet?.userId === authData.id &&
-              !blogpostLikeGet?.is_liked
-            ) {
-              (async () => {
-                const blogpostLikeGet = await AppDataSource.getRepository(
-                  BlogpostLike
-                )
-                  .createQueryBuilder()
-                  .update()
-                  .set({ is_liked: true })
-                  .where("blogpostId = :blogpostId", {
-                    blogpostId: req.params.blogpostId,
-                  })
-                  .execute();
+                await blogpostLike.save();
                 res.json({ is_liked: true });
+                return next;
               })();
+            } catch (err) {
+              if (err) {
+                res.json(err);
+                return err;
+              }
             }
           })();
+        }
+      }
+    );
+  },
+];
+
+export const blogpostLikeDelete = [
+  verifyToken,
+  (req: any, res: Response, next: NextFunction) => {
+    jwt.verify(
+      req.cookies.access_token,
+      process.env.JWT_SECRET!,
+      (err: any, authData: any) => {
+        if (err) {
+          res.sendStatus(403);
+        } else {
+          try {
+            (async () => {
+              const blogpostLike = await AppDataSource.getRepository(
+                BlogpostLike
+              )
+                .createQueryBuilder()
+                .delete()
+                .from(BlogpostLike)
+                .where("blogpostId = :blogpostId", {
+                  blogpostId: req.params.blogpostId,
+                })
+                .andWhere("userId = :userId", {
+                  userId: authData.id,
+                })
+                .execute();
+              res.sendStatus(200);
+            })();
+          } catch (error) {
+            res.sendStatus(400);
+          }
         }
       }
     );

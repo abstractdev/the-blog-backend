@@ -14,9 +14,6 @@ export class BlogpostLike extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Column({ default: false })
-  is_liked: boolean;
-
   @ManyToOne(() => User, (user) => user.blogpost_likes)
   @JoinColumn()
   user: User;
