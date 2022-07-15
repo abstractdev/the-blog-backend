@@ -54,7 +54,9 @@ export class Blogpost extends BaseEntity {
   @OneToMany(() => BlogpostLike, (blogpostLike) => blogpostLike.blogpost)
   blogpost_likes: BlogpostLike[];
 
-  @ManyToMany(() => Category, (category) => category.blogposts)
+  @ManyToMany(() => Category, (category) => category.blogposts, {
+    onDelete: "CASCADE",
+  })
   @JoinTable()
   categories: Category[];
 }

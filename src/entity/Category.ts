@@ -15,6 +15,8 @@ export class Category extends BaseEntity {
   @Column()
   name: string;
 
-  @ManyToMany(() => Blogpost, (blogpost) => blogpost.categories)
+  @ManyToMany(() => Blogpost, (blogpost) => blogpost.categories, {
+    onDelete: "CASCADE",
+  })
   blogposts: Blogpost[];
 }

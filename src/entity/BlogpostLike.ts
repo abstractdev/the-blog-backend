@@ -21,7 +21,9 @@ export class BlogpostLike extends BaseEntity {
   @Column()
   userId: string;
 
-  @ManyToOne(() => Blogpost, (blogpost) => blogpost.blogpost_likes)
+  @ManyToOne(() => Blogpost, (blogpost) => blogpost.blogpost_likes, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn()
   blogpost: Blogpost;
 
