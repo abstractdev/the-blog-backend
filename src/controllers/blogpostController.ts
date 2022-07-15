@@ -133,20 +133,14 @@ export const blogpostPut = [
   // Validate and sanitize fields.
   body("title")
     .trim()
-    .isLength({ min: 1 })
-    .withMessage("Title cannot be empty")
     .isLength({ max: 20 })
     .withMessage("Title cannot exceed 20 characters"),
   body("image_url")
     .trim()
-    .isLength({ min: 1 })
-    .withMessage("Image Url cannot be empty")
     .isLength({ max: 100 })
     .withMessage("Image Url cannot exceed 100 characters"),
   body("content")
     .trim()
-    .isLength({ min: 1 })
-    .withMessage("Content cannot be empty")
     .isLength({ max: 200 })
     .withMessage("Content cannot exceed 200 characters"),
   //verify token
@@ -165,26 +159,41 @@ export const blogpostPut = [
           if (err) {
             res.sendStatus(403);
           } else {
-            const { title, image_url, content } = req.body;
-            if (err) {
-              res.json(err);
-              return next(err);
-            } else
-              try {
-                (async () => {
-                  const blogpost = await AppDataSource.getRepository(Blogpost)
-                    .createQueryBuilder()
-                    .update()
-                    .set({ title, image_url, content })
-                    .where("id = :id", {
-                      id: req.params.id,
-                    })
-                    .execute();
-                  res.sendStatus(200);
-                })();
-              } catch (error) {
-                res.sendStatus(400);
-              }
+            try {
+              console.log(req.params.id);
+              (async () => {
+                let { title, image_url, content, is_published } = req.body;
+                const blogpostGet = await AppDataSource.getRepository(Blogpost)
+                  .createQueryBuilder()
+                  .where("id = :id", { id: req.params.id })
+                  .getOne();
+                if (!title) {
+                  title = blogpostGet?.title;
+                }
+                if (!image_url) {
+                  image_url = blogpostGet?.image_url;
+                }
+                if (!content) {
+                  content = blogpostGet?.content;
+                }
+                const blogpostPut = await AppDataSource.getRepository(Blogpost)
+                  .createQueryBuilder()
+                  .update()
+                  .set({
+                    title,
+                    image_url,
+                    content,
+                    is_published,
+                  })
+                  .where("id = :id", {
+                    id: req.params.id,
+                  })
+                  .execute();
+                res.sendStatus(200);
+              })();
+            } catch (error) {
+              res.sendStatus(400);
+            }
           }
         }
       );
