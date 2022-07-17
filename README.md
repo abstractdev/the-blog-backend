@@ -3,6 +3,7 @@
 # [![The Blog](/blog.png)](https://abstractdev.github.io/the-blog/)
 
 The back-end for my full stack blog.</br>Built with Express/TypeORM/PostgreSQL.
+[Frontend repo](https://github.com/abstractdev/the-blog)
 
 ---
 
