@@ -42,7 +42,7 @@ try {
   //express middleware
   app.use(cors({
     credentials: true,
-    origin: "https://abstractdev.github.io"
+    origin: "http://localhost:3000"
   }));
   app.use(cookieParser());
   app.use(express.json());
